@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>색상 추출기 - 탄성아트</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #fdfbf9;
+      padding: 2rem;
+      text-align: center;
+    }
+    canvas {
+      max-width: 100%;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+    }
+    #hexCode {
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      color: #333;
+    }
+    #colorPreview {
+      width: 50px;
+      height: 50px;
+      display: inline-block;
+      border: 1px solid #999;
+      vertical-align: middle;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 사진에서 색상 추출하기</h1>
+  <input type="file" id="imageUpload" accept="image/*">
+  <canvas id="canvas"></canvas>
+  <p id="hexCode">선택된 색상: <span id="colorValue">-</span> <span id="colorPreview"></span></p>
+  <script>
+    const input = document.getElementById("imageUpload");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const colorValue = document.getElementById("colorValue");
+    const colorPreview = document.getElementById("colorPreview");
+    input.addEventListener("change", (e) => {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+        }
+        img.src = event.target.result;
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    });
+    canvas.addEventListener("click", (e) => {
+      const x = e.offsetX;
+      const y = e.offsetY;
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const hex = "#" +
+        pixel[0].toString(16).padStart(2, "0") +
+        pixel[1].toString(16).padStart(2, "0") +
+        pixel[2].toString(16).padStart(2, "0");
+      colorValue.innerText = hex.toUpperCase();
+      colorPreview.style.backgroundColor = hex;
+    });
+  </script>
+</body>
+</html>
